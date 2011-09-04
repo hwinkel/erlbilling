@@ -1,0 +1,26 @@
+<html>
+<h1>Transactions</h1>
+<erl>
+out(A) ->
+    AddTd = fun(Val) ->
+                    if is_binary(Val) == true ->
+                            {td, [], uuid:to_string(Val)};
+                       true ->
+                            {td, [], f("~w",[Val])}
+                    end
+            end,
+    AddTr = fun(Val) ->
+                    {tr, [], lists:map(AddTd, Val)}
+            end,
+    Transactions = billingserver:transaction_list(),
+    {ehtml, [{table, [],
+             lists:append([[{tr, [], [
+                                      {td, [{width, "150px"}], "Transaction id"},
+                                      {td, [], "Account number"},
+                                      {td, [], "Amount"},
+                                      {td, [], "Finished"}]}], 
+                           lists:map(AddTr, Transactions)])},
+             {p, [], {b, [], f("Total: ~w", [length(Transactions)])}}]}.
+</erl>
+<p><a href="index.yaws">Index</a></p>
+</html>

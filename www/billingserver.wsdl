@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--     xmlns:tns="http://localhost/billingserver" -->
+<wsdl:definitions 
+    targetNamespace="http://localhost:8081" 
+    xmlns:tns="http://localhost/billingserver.wsdl"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" 
+    xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+    xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" 
+    xmlns:s="http://www.w3.org/2001/XMLSchema" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+
+  <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Simple billing written on Erlang. SOAP server is yaws.
+  There are following functions:
+  ReserveAmount(AccountNumber, Amount)
+  ChargeAmount(AccountNumber, Amount)
+  ConfirmTransaction(TransactionID)
+  CancelTransaction(TransactionID)
+  RefillAmount(AccountNumber, Amount)
+  </wsdl:documentation>
+  <wsdl:types>
+   <s:schema elementFormDefault="qualified" targetNamespace="http://localhost:8081/billingserver.wsdl">
+
+      <s:element name="ReserveAmount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="AccountNumber" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="Amount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="ReserveAmountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Result" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="ChargeAmount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="AccountNumber" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="Amount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="ChargeAmountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Result" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="RefillAmount">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="AccountNumber" type="s:int" />
+            <s:element minOccurs="1" maxOccurs="1" name="Amount" type="s:int" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="RefillAmountResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Result" type="s:string"/>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="ConfirmTransaction">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="TransactionId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="ConfirmTransactionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="CancelTransaction">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="TransactionId" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+      <s:element name="CancelTransactionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Result" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+
+    </s:schema>
+  </wsdl:types>
+  
+  <wsdl:message name="ReserveAmountSoapIn">
+    <wsdl:part name="parameters" element="ReserveAmount" />
+  </wsdl:message>
+  <wsdl:message name="ReserveAmountSoapOut">
+    <wsdl:part name="parameters" element="ReserveAmountResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ChargeAmountSoapIn">
+    <wsdl:part name="parameters" element="ChargeAmount" />
+  </wsdl:message>
+  <wsdl:message name="ChargeAmountSoapOut">
+    <wsdl:part name="parameters" element="ChargeAmountResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="RefillAmountSoapIn">
+    <wsdl:part name="parameters" element="RefillAmount" />
+  </wsdl:message>
+  <wsdl:message name="RefillAmountSoapOut">
+    <wsdl:part name="parameters" element="RefillAmountResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="ConfirmTransactionSoapIn">
+    <wsdl:part name="parameters" element="ConfirmTransaction" />
+  </wsdl:message>
+  <wsdl:message name="ConfirmTransactionSoapOut">
+    <wsdl:part name="parameters" element="ConfirmTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:message name="CancelTransactionSoapIn">
+    <wsdl:part name="parameters" element="CancelTransaction" />
+  </wsdl:message>
+  <wsdl:message name="CancelTransactionSoapOut">
+    <wsdl:part name="parameters" element="CancelTransactionResponse" />
+  </wsdl:message>
+
+  <wsdl:portType name="BillingServerSoap">
+
+    <wsdl:operation name="ReserveAmount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Reserve amount in the user's account.
+      Reserved amount is not available for other
+      operations, but finally not be debited from the account. The function 
+      return guid TransactionID or one of the following errors:
+      E_INTERNALERROR</wsdl:documentation>
+      <wsdl:input message="ReserveAmountSoapIn" />
+      <wsdl:output message="ReserveAmountSoapOut" />
+    </wsdl:operation>
+
+    <wsdl:operation name="ChargeAmount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Immediately writes off the amount from
+      user's account. The function return one or guid TransactionID
+      of the following errors: E_INVALIDACCOUNT, E_INSUFFICIENTCREDIT,
+      E_INTERNALERROR</wsdl:documentation>
+      <wsdl:input message="ChargeAmountSoapIn" />
+      <wsdl:output message="ChargeAmountSoapOut" />
+    </wsdl:operation>
+
+    <wsdl:operation name="RefillAmount">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Adds the user's account.
+      The function return guid TransactionID or one of the following:
+      Error: E_INVALIDACCOUNT, E_INTERNALERROR</wsdl:documentation>
+      <wsdl:input message="RefillAmountSoapIn" />
+      <wsdl:output message="RefillAmountSoapOut" />
+    </wsdl:operation>
+
+    <wsdl:operation name="ConfirmTransaction">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Debits from the account of the amount previously
+      Assigned by ReserveAmount. The function should return
+      one of the following results: E_SUCCESS, E_TRANSACTIONNOTFOUND,
+      E_WRONGTRANSACTIONSTATUS, E_INTERNALERROR</wsdl:documentation>
+      <wsdl:input message="ConfirmTransactionSoapIn" />
+      <wsdl:output message="ConfirmTransactionSoapOut" />
+    </wsdl:operation>
+    
+    <wsdl:operation name="CancelTransaction">
+      <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Releases in the account an amount
+      previously reserved by ReserveAmount. The function should
+      return one of the following results: E_SUCCESS,
+      E_TRANSACTIONNOTFOUND, E_WRONGTRANSACTIONSTATUS, E_INTERNALERROR</wsdl:documentation>
+      <wsdl:input message="CancelTransactionSoapIn" />
+      <wsdl:output message="CancelTransactionSoapOut" />
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <wsdl:binding name="BillingServerSoap" type="BillingServerSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <wsdl:operation name="ReserveAmount">
+      <soap:operation soapAction="http://localhost/ReserveAmount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ChargeAmount">
+      <soap:operation soapAction="http://localhost/ChargeAmount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="RefillAmount">
+      <soap:operation soapAction="http://localhost/RefillAmount" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="ConfirmTransaction">
+      <soap:operation soapAction="http://localhost/ConfirmTransaction" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+    <wsdl:operation name="CancelTransaction">
+      <soap:operation soapAction="http://localhost/CancelTransaction" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+  <wsdl:service name="BillingServer">
+    <wsdl:documentation xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">Simple billing written on Erlang. SOAP server is yaws.</wsdl:documentation>  
+    <wsdl:port name="BillingServerSoap" binding="BillingServerSoap">
+      <soap:address location="http://localhost:8081/soapbilling.yaws" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

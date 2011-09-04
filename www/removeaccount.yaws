@@ -1,0 +1,24 @@
+<html>
+<h1>Remove Account</h1>
+<erl>
+out(A) ->
+    Req = A#arg.req,
+
+    if
+        Req#http_request.method == 'GET' ->
+            {ehtml, {form, [{action, "removeaccount.yaws"},{method, "post"}],
+                     [{p, [], "Account identifier"},
+                      {input, [{name, accountid}, {type, text}]},
+                      {input, [{type, submit}]}]}};
+
+        Req#http_request.method == 'POST' ->
+            L = yaws_api:parse_post(A),
+            [{"accountid", IdStr}|_] = L,
+            {Id, _} = string:to_integer(IdStr),
+            billingserver:remove_account(Id),
+            {ehtml, {p, [], IdStr}};
+        true -> {ehtml, {p, [], "Error"}}
+    end.
+</erl>
+<a href="index.yaws">Index</a>
+</html>

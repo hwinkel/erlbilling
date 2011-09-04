@@ -1,0 +1,29 @@
+<html>
+<h1>Refill Amount</h1>
+<erl>
+out(A) ->
+    Req = A#arg.req,
+
+    if
+        Req#http_request.method == 'GET' ->
+            {ehtml, {form, [{action, "refillamount.yaws"},{method, "post"}],
+                     [{p, [], "Account identifier"},
+                      {input, [{name, accountid}, {type, text}]},
+                      {input, [{name, amount}, {type, text}]},
+                      {input, [{type, submit}]}]}};
+        Req#http_request.method == 'POST' ->
+            L = yaws_api:parse_post(A),
+            [{"accountid", IdStr}, {"amount", AmountStr}|_] = L,
+            {Id, _} = string:to_integer(IdStr),
+            {Amount, _} = string:to_integer(AmountStr),
+            Result = billingserver:refill_amount(Id, Amount),
+            if is_binary(Result) ->
+                    {ehtml, {p, [], uuid:to_string(Result)}};
+               true ->
+                    {ehtml, {p, [], f("~w", [Result])}}
+            end;
+        true -> {ehtml, {p, [], "Error"}}
+    end.
+</erl>
+<a href="index.yaws">Index</a>
+</html>

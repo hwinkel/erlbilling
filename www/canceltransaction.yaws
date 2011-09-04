@@ -1,0 +1,24 @@
+<html>
+<h1>Cancell transaction</h1>
+<h2>Copy transaction id from web page</h2>
+<erl>
+out(A) ->
+    Req = A#arg.req,
+    
+    if
+        Req#http_request.method == 'GET' ->
+            {ehtml, {form, [{action, "canceltransaction.yaws"}, {method, "post"}],
+                     [{p, [], "Transaction ID"},
+                      {input, [{name, transactionid}, {type, text}]},
+                      {input, [{type, submit}]}]}};
+        Req#http_request.method == 'POST' ->
+            L = yaws_api:parse_post(A),
+            [{"transactionid", IdStr}|_] = L,
+            Id = uuid:to_binary(IdStr),
+            Result = billingserver:cancel_transaction(Id),
+            {ehtml, {p, [], f("~w", [Result])}};
+        true -> {ehtml, {p, [], "Error"}}
+    end.
+</erl>
+<a href="index.yaws">Index</a>
+</html>

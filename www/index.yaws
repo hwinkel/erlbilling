@@ -1,0 +1,44 @@
+<html>
+<h1>Functions</h1>
+<p>
+<a href="addaccount.yaws">Add account</a>
+<a href="removeaccount.yaws">Remove account</a>
+<a href="showaccount.yaws">Show account</a>
+<a href="refillamount.yaws">Refill amount</a>
+</p>
+
+<p>
+<a href="chargeamount.yaws">Charge amount</a>
+</p>
+
+<p>
+<a href="reserveamount.yaws">Reserve amount</a>
+<a href="confirmtransaction.yaws">Confirm transaction</a>
+<a href="canceltransaction.yaws">Cancel transaction</a>
+</p>
+
+<p>
+<i>
+<a href="addmanyaccounts.yaws">Add many accounts</a>
+<a href="addmanytransactions.yaws">Add many transactions</a>
+</i>
+</p>
+
+<p>
+<i>
+<a href="accountlist.yaws">Show list of accounts. May be slow</a>
+</i>
+</p>
+
+<p>
+<i>
+<a href="transactionlist.yaws">Show list of transactions. May be slow</a>
+</i>
+</p>
+
+<p>
+<i>
+<a href="debug.yaws">Debug information</a>
+</i>
+</p>
+</html>

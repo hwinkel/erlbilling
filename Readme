@@ -1,0 +1,64 @@
+Общее затраченное время: 20 часов.
+
+Использованные инструменты:
+erlang r14b
+mnesia
+yaws
+yaws_soap_lib
+erlsom
+uuid (gitorious.org).
+
+----
+Распаковка, компиляция:
+tar xzf erlbilling.tar.gz
+# erlsom
+cd erlbilling/deps/erlsom
+rebar compile
+# yaws
+cd ../yaws
+autoconf
+./configure
+make
+cd ../..
+
+Запуск:
+erl
+c(billingserver).
+billingserver:start(init).
+
+Останов:
+billingserver:stop().
+
+Запуск в последующие разы:
+erl
+billingserver:start().
+
+Запуск сервера происходит на 0.0.0.0:8081.
+Веб интерфейс http://localhost:8081/
+
+Для создания N аккаунтов служит форма. Форма создает от 1 до N аккаунтов с порядковыми идентификаторами.
+http://localhost:8081/addmanyaccounts.yaws
+
+----
+WSDL файл для soap интерфейса:
+http://localhost:8081/billingserver.wsdl
+
+erlbilling/www/billingserver.wsdl
+
+----
+Тестирование с помощью erlang yaws_soap_client НА ЛОКАЛЬНОМ компьютере.
+
+Функция test содержит 4-5 траназакций.
+test(Count) выполняет транзакции для заданного количество аккаунтов.
+
+test_under_timer(AccCount, N) делает N замеров для test(AccCount).
+
+erl
+1> c(test).
+
+2> test:test_under_timer(40, 100). % 100 замеров для test(40) (>160 транзакций).
+Range: 779519 - 1017516 mics
+Median: 810963 mics
+Average: 828167 mics
+810963
+3> 

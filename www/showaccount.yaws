@@ -1,0 +1,67 @@
+<html>
+<h1>Show account</h1>
+<erl>
+out(A) ->
+    Req = A#arg.req,
+    if
+        Req#http_request.method == 'GET' ->
+            {ehtml, {form, [{action, "showaccount.yaws"},{method, post}],
+                     [{p, [], "Account identifier"},
+                      {input, [{name, accountid}, {type, text}]},
+                      {input, [{type, submit}]}]}};
+
+        Req#http_request.method == 'POST' ->
+            L = yaws_api:parse_post(A),
+            [{"accountid", IdStr}|_] = L,
+            {Id, _} = string:to_integer(IdStr),
+            
+            case billingserver:retreive_account(Id)
+            of {aborted, Reason} ->
+                    {ehtml, {p, [], f("Error. Reason: ~p", Reason)}};
+                {atomic, Rows} ->
+                    AddTd = fun(Val) ->
+                                    if is_binary(Val) == true ->
+                                            {td, [], uuid:to_string(Val)};
+                                       true ->
+                                            {td, [], f("~w", [Val])}
+                                    end
+                            end,
+                    AddTr = fun(Val) ->
+                                    if
+                                        is_tuple(Val) == true ->
+                                            [account | Rest] = tuple_to_list(Val),
+                                            {tr, [], lists:map(AddTd, Rest)};
+                                        is_list(Val) == true ->
+                                            {tr, [], lists:map(AddTd, Val)}
+                                    end
+                            end,
+                    {ehtml, lists:append([[
+                                           {table, [],
+                                            lists:append([[{tr, [], [{td, [], "Account number"},
+                                                                     {td, [], "Balance"}]}], 
+                                                          lists:map(AddTr, Rows)])}],
+                                          [{h1, [], "Unfinished transactions"},
+                                           {table, [],
+                                            lists:append([[{tr, [], [
+                                                                     {td, [{width, "150px"}], "Transaction id"},
+                                                                     {td, [], "Account number"},
+                                                                     {td, [], "Amount"},
+                                                                     {td, [], "Finished"}]}], 
+                                                          lists:map(AddTr, billingserver:unfinished_transaction_list(Id))])}
+                                          ],
+                                          [{h1, [], "Finished transactions"},
+                                           {table, [],
+                                            lists:append([[{tr, [], [
+                                                                     {td, [{width, "150px"}], "Transaction id"},
+                                                                     {td, [], "Account number"},
+                                                                     {td, [], "Amount"},
+                                                                     {td, [], "Finished"}]}], 
+                                                          lists:map(AddTr, billingserver:finished_transaction_list(Id))])}
+                                          ]
+                                         ])}
+            end;
+        true -> {ehtml, {p, [], "Error"}}
+    end.
+</erl>
+<a href="index.yaws">Index</a>
+</html>

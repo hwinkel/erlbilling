@@ -1,0 +1,36 @@
+<html>
+<h1>Add many accounts</h1>
+<erl>
+out(A) ->
+    Req = A#arg.req,
+    
+    if
+        Req#http_request.method == 'GET' ->
+            {ehtml, {form, [{action, "addmanyaccounts.yaws"},{method, "post"}],
+                     [{p, [], "Max id"},
+                      {input, [{name, count}, {type, text}]},
+                      {input, [{type, submit}]}]}};
+        
+        Req#http_request.method == 'POST' ->
+            L = yaws_api:parse_post(A),
+            [{"count", CountStr}|_] = L,
+            {SendedCount, _} = string:to_integer(CountStr),
+            Fun = fun(Self, 0) ->
+                          0;
+                     (Self, Count) ->
+                          Id = random:uniform((2 bsl 16) - 1),
+                                                %billingserver:add_account(Id),
+                                                %billingserver:refill_amount(Id, random:uniform((2 bsl 16) - 1)),
+                          billingserver:add_account(Count),
+                          billingserver:refill_amount(Count, random:uniform((2 bsl 16) - 1)),
+                          Self(Self, Count - 1);
+                     (Self, 0) ->
+                          0
+                  end,
+            Fun(Fun, SendedCount),
+            {ehtml, {p, [], "Success"}};
+        true -> {ehtml, {p, [], "Error"}}
+    end.
+</erl>
+<a href="index.yaws">Index</a>
+</html>

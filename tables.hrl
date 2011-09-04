@@ -1,0 +1,2 @@
+-record(account, {accountnumber, balance}).
+-record(transaction, {transactionid, accountnumber, amount, finished}).

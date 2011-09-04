@@ -1,0 +1,19 @@
+<html>
+<h1>Accounts</h1>
+<erl>
+out(A) ->
+    AddTd = fun(Val) ->
+                    {td, [], integer_to_list(Val)}
+            end,
+    AddTr = fun(Val) ->
+                    {tr, [], lists:map(AddTd, Val)}
+            end,
+    Accounts = billingserver:account_list(),
+    {ehtml, [{table, [],
+             lists:append([[{tr, [], [{td, [], "Account number"},
+                                      {td, [], "Balance"}]}], 
+                           lists:map(AddTr, Accounts)])},
+            {p, [], {b, [], f("Total: ~w", [length(Accounts)])}}]}.
+</erl>
+<p><a href="index.yaws">Index</a></p>
+</html>
